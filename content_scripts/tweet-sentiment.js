@@ -1,3 +1,7 @@
+if (typeof chrome !== 'undefined') {
+  const browser = chrome;
+}
+
 // This function performs sentiment analysis on a given string of text
 function analyzeSentiment(text) {
   // For now, just randomly return a sentiment value (1, -1, or 0)
@@ -9,9 +13,6 @@ function analyzeSentiment(text) {
 
   // NOTE: instead of "browser" please use "chrome" if you are planning to run the extension on the chrome browser
   // Send the other scripts the object with all the calculated sentiments
-  if (typeof chrome !== 'undefined') {
-    const browser = chrome;
-  }
   browser.runtime.sendMessage({
     type: "sentiment",
     data: tweetSentiment,
