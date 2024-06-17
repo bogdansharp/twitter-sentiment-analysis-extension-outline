@@ -1,6 +1,5 @@
-if (typeof chrome !== 'undefined') {
-  const browser = chrome;
-}
+const curBrowser = (typeof chrome !== 'undefined') ? chrome : (typeof browser !== 'undefined' ? browser : null);
+
 
 // This function performs sentiment analysis on a given string of text
 function analyzeSentiment(text) {
@@ -13,7 +12,7 @@ function analyzeSentiment(text) {
 
   // NOTE: instead of "browser" please use "chrome" if you are planning to run the extension on the chrome browser
   // Send the other scripts the object with all the calculated sentiments
-  browser.runtime.sendMessage({
+  curBrowser.runtime.sendMessage({
     type: "sentiment",
     data: tweetSentiment,
   });
@@ -75,7 +74,7 @@ document.addEventListener("scroll", function () {
 });
 
 
-browser.runtime.onMessage.addListener(function (message) {
+curBrowser.runtime.onMessage.addListener(function (message) {
   // reset sentiment if `resetSentiment` is seen
   if (message.type === "resetSentiment") tweetSentiment = {};
 });
