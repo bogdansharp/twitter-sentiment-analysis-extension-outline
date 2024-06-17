@@ -72,3 +72,9 @@ tweetSentiment = {};
 document.addEventListener("scroll", function () {
   doSentimentAnalysis();
 });
+
+
+browser.runtime.onMessage.addListener(function (message) {
+  // reset sentiment if `resetSentiment` is seen
+  if (message.type === "resetSentiment") tweetSentiment = {};
+});
