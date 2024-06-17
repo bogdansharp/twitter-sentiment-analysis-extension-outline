@@ -1,3 +1,6 @@
+const curBrowser = (typeof chrome !== 'undefined') ? chrome : (typeof browser !== 'undefined' ? browser : null);
+
+
 // This function create the pie chart using the data provided
 function createPieChart(data) {
   document.getElementById("myChart").remove();
@@ -42,11 +45,8 @@ sentimentValues = [];
 
 // NOTE: instead of "browser" please use "chrome" if you are planning to run the extension on the chrome browser
 // Send a "getSentiment" request to load the sentiments already loaded
-if (typeof chrome !== 'undefined') {
-  const browser = chrome;
-}
-browser.runtime.sendMessage({ type: "getSentiment" });
-browser.runtime.onMessage.addListener(function (message) {
+curBrowser.runtime.sendMessage({ type: "getSentiment" });
+curBrowser.runtime.onMessage.addListener(function (message) {
   // Whenever new sentiments are found, this will trigger updating the sentimentValues data
   if (message.type === "sentimentValues") sentimentValues = message.data; // Set the object to the data received
   // Recreate the pie chart whenever there is any update
@@ -59,10 +59,10 @@ reset.style = "display:block; margin: 0 auto; margin-bottom: 0.5rem;";
 reset.textContent = "Reset";
 reset.addEventListener("click", () => {
   // NOTE: instead of "browser" please use "chrome" if you are planning to run the extension on the chrome browser
-  browser.runtime.sendMessage({ type: "reset" });
-  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+  curBrowser.runtime.sendMessage({ type: "reset" });
+  curBrowser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     // Send a message to the content script in the active tab
-    browser.tabs.sendMessage(tabs[0].id, {
+    curBrowser.tabs.sendMessage(tabs[0].id, {
       type: "resetSentiment",
     });
   });
