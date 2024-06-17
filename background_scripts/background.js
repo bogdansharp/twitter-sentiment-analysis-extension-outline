@@ -42,3 +42,21 @@ browser.runtime.onMessage.addListener(function (message) {
     data: sentimentValues,
   });
 });
+
+
+browser.runtime.onMessage.addListener(function (message) {
+  if (message.type === "sentiment") tweetSentiment = message.data; // Set the object to the data received
+  else if (message.type === "reset") tweetSentiment = {}; // Reset the object to have no sentiments calculated
+
+  // Count the sentiment values and save them into the sentiment values array
+  sentimentObject = countSentiments(tweetSentiment);
+  sentimentValues = [
+    sentimentObject["-1"],
+    sentimentObject["0"],
+    sentimentObject["1"],
+  ];
+  browser.runtime.sendMessage({
+    type: "sentimentValues",
+    data: sentimentValues,
+  });
+});
