@@ -53,7 +53,7 @@ curBrowser.runtime.onMessage.addListener(function (message) {
     sentimentObject["0"],
     sentimentObject["1"],
   ];
-  browser.runtime.sendMessage({
+  curBrowser.runtime.sendMessage({
     type: "sentimentValues",
     data: sentimentValues,
   });
