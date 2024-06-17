@@ -52,3 +52,19 @@ browser.runtime.onMessage.addListener(function (message) {
   // Recreate the pie chart whenever there is any update
   createPieChart(sentimentValues);
 });
+
+
+const reset = document.createElement("button");
+reset.style = "display:block; margin: 0 auto; margin-bottom: 0.5rem;";
+reset.textContent = "Reset";
+reset.addEventListener("click", () => {
+  // NOTE: instead of "browser" please use "chrome" if you are planning to run the extension on the chrome browser
+  browser.runtime.sendMessage({ type: "reset" });
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+    // Send a message to the content script in the active tab
+    browser.tabs.sendMessage(tabs[0].id, {
+      type: "resetSentiment",
+    });
+  });
+});
+document.body.appendChild(reset);
