@@ -1,23 +1,55 @@
 const curBrowser = (typeof chrome !== 'undefined') ? chrome : (typeof browser !== 'undefined' ? browser : null);
 
 
-// This function performs sentiment analysis on a given string of text
-function analyzeSentiment(text) {
-  // For now, just randomly return a sentiment value (1, -1, or 0)
-  const sentiments = [1, -1, 0];
-  const sentiment = sentiments[Math.floor(Math.random() * sentiments.length)];
+const controller = new AbortController();
+const signal = controller.signal;
 
-  // Save this sentiment value to this text in an object called `tweetSentiment`
-  tweetSentiment[text] = sentiment;
+async function sendRequest(text) {
+  const containerUrl = ""; // MUST CHANGE
 
-  // NOTE: instead of "browser" please use "chrome" if you are planning to run the extension on the chrome browser
-  // Send the other scripts the object with all the calculated sentiments
-  curBrowser.runtime.sendMessage({
+  // Set the request body
+  const postData = {
+    rawDocument: {
+      text: text,
+    },
+  };
+
+  // This attempts to send the request to the sentiment analysis model
+  // It waits until a response is received
+  try {
+    const response = await fetch(containerUrl, {
+      method: "POST",
+      body: JSON.stringify(postData),
+      headers: {
+        "Content-Type": "application/json",
+        "grpc-metadata-mm-model-id":
+          "sentiment_aggregated-cnn-workflow_lang_en_stock",
+      },
+      signal,
+    });
+    // Parse and save the response from the sentiment analysis model
+    const data = await response.json();
+
+    // Handle the response data from the sentiment analysis model
+    const label = data["documentSentiment"]["label"];
+    if (label == "SENT_POSITIVE") return 1;
+    if (label == "SENT_NEGATIVE") return -1;
+    return 0;
+  } catch (error) {
+    // Handle any errors that occurred while making the request, right now just display it in the browser console
+    console.error(error);
+  }
+}
+
+async function analyzeSentiment(text) {
+  // send the request with the text that needs to be analyzed
+  const sentiment = await sendRequest(text);
+  tweetSentiment[text] = sentiment; // save response in an object
+  // send the sentiment data out to other scripts
+  browser.runtime.sendMessage({
     type: "sentiment",
     data: tweetSentiment,
   });
-
-  // return the calculated sentiment value to use somewhere else
   return sentiment;
 }
 
